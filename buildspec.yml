@@ -4,7 +4,6 @@ env:
   variables:
     AWS_DEFAULT_REGION: "us-east-1"
     ECR_REPOSITORY: node-api
-    IMAGE_TAG: $(cat /proc/sys/kernel/random/uuid)
 phases:
   build:
     commands:
@@ -13,6 +12,7 @@ phases:
       - LOGIN_CMD=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
       - ECR_REPO_URL=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_DEFAULT_REGION --query 'repositories[0].repositoryUri' --output text)
       - echo $LOGIN_CMD | docker login --username AWS --password-stdin $ECR_REPO_URL
-      - echo "$ECR_REPO_URL:$IMAGE_TAG"
-      - docker build -t "$ECR_REPO_URL:$IMAGE_TAG" .
-      - docker push "$ECR_REPO_URL:$IMAGE_TAG
+      - IMAGE_TAG=$(cat /proc/sys/kernel/random/uuid)
+      - echo $ECR_REPO_URL:$IMAGE_TAG
+      - docker build -t $ECR_REPO_URL:$IMAGE_TAG .
+      - docker push $ECR_REPO_URL:$IMAGE_TAG
