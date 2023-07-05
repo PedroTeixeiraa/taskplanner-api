@@ -6,14 +6,11 @@ env:
     ECR_REPOSITORY: node-api
     IMAGE_TAG: "$(date +%s)"
 phases:
-  pre_build:
+    build:
     commands:
       - echo Logging in to Amazon ECR
-      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-  build:
-    commands:
-      - echo Building the Docker image
-      - REPO_URL=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_DEFAULT_REGION --query 'repositories[0].repositoryUri' --output text)
-      - echo $REPO_URL
-      # - docker build -t $REPO_URL:$IMAGE_TAG .
-      # - docker push $REPO_URL:$IMAGE_TAG
+      - LOGIN_CMD=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
+      - ECR_REPO_URL=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_DEFAULT_REGION --query 'repositories[0].repositoryUri' --output text)
+      - echo $LOGIN_CMD | docker login --username AWS --password-stdin $ECR_REPO_URL
+      - docker build -t $ECR_REPO_URL:$IMAGE_TAG .
+      - docker push $ECR_REPO_URL:$IMAGE_TAG
