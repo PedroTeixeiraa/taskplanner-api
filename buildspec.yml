@@ -6,7 +6,7 @@ env:
     ECR_REPOSITORY: node-api
     IMAGE_TAG: "$(date +%s)"
 phases:
-    build:
+  build:
     commands:
       - echo Logging in to Amazon ECR
       - LOGIN_CMD=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
