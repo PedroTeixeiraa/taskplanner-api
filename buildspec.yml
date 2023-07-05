@@ -4,7 +4,7 @@ env:
   variables:
     AWS_DEFAULT_REGION: "us-east-1"
     ECR_REPOSITORY: node-api
-    IMAGE_TAG: $(date +%s)-$(cat /proc/sys/kernel/random/uuid)
+    IMAGE_TAG: $CODEBUILD_BUILD_ID
 phases:
   build:
     commands:
