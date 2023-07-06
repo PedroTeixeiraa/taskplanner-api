@@ -4,15 +4,24 @@ env:
   variables:
     AWS_DEFAULT_REGION: "us-east-1"
     ECR_REPOSITORY: node-api
-    ECR_REPO_URL: $ecr_uri
+    ECS_CONTAINER_NAME: node3
 phases:
-  build:
+  pre_build:
     commands:
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 945952216210.dkr.ecr.us-east-1.amazonaws.com
+      - ECR_REPO_URL=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_DEFAULT_REGION --query 'repositories[0].repositoryUri' --output text)
       - IMAGE_TAG=$(cat /proc/sys/kernel/random/uuid)
       - echo $ECR_REPO_URL:$IMAGE_TAG
+  build:
+    commands:
       # - docker build -t $ECR_REPO_URL:$IMAGE_TAG .
       # - docker push $ECR_REPO_URL:$IMAGE_TAG
-    
-# artifacts:
-    # files: imagedefinitions.json
+  post_build:
+    commands:
+      - LOGIN_CMD=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
+      - echo $LOGIN_CMD | docker login --username AWS --password-stdin $ECR_REPO_URL
+      - echo Writing image definitions file...
+      - printf '[{"name":"'$ECS_CONTAINER_NAME'","imageUri":"%s"}]' $ECR_REPO_URL:$IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+    files: imagedefinitions.json    
+
