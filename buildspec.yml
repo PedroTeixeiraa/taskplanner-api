@@ -13,12 +13,12 @@ phases:
       - echo $ECR_REPO_URL:$IMAGE_TAG
   build:
     commands:
+      - LOGIN_CMD=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
+      - echo $LOGIN_CMD | docker login --username AWS --password-stdin $ECR_REPO_URL
       - docker build -t $ECR_REPO_URL:$IMAGE_TAG .
       - docker push $ECR_REPO_URL:$IMAGE_TAG
   post_build:
-    commands:
-      - LOGIN_CMD=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
-      - echo $LOGIN_CMD | docker login --username AWS --password-stdin $ECR_REPO_URL
+    commands:   
       - echo Writing image definitions file...
       - printf '[{"name":"'$ECS_CONTAINER_NAME'","imageUri":"%s"}]' $ECR_REPO_URL:$IMAGE_TAG > imagedefinitions.json
 
