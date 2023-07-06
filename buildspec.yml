@@ -4,7 +4,7 @@ env:
   variables:
     AWS_DEFAULT_REGION: "us-east-1"
     ECR_REPOSITORY: node-api
-    ECS_CONTAINER_NAME: node3
+    ECS_CONTAINER_NAME: node
 phases:
   pre_build:
     commands:
