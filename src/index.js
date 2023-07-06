@@ -10,7 +10,7 @@ app.use(
 )
 
 app.get('/', (request, response) => {
-    response.json({ info: 'Node.js, Express, and Postgres API' })
+    response.json({ info: 'Teste sucesso Deploy' })
 })
 
 app.listen(3000, () => {
