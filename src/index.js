@@ -10,7 +10,7 @@ app.use(
 )
 
 app.get('/', (request, response) => {
-    response.json({ info: 'Teste sucesso Deploy' })
+    response.json({ info: 'Teste sucesso Deploy versão 2' })
 })
 
 app.listen(3000, () => {
