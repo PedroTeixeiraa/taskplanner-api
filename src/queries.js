@@ -1,20 +1,27 @@
-require('dotenv/config');
 const mysql = require('mysql');
 
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    database: process.env.DB_DATABASE,
-    password: process.env.DB_PASSWORD,
-});
+const secret = require('./secret')
 
-connection.connect((err) => {
-    if (err) throw err;
-});
+let connection
+
+const getConnection = async () => {
+    const secrets = await secret.getSecret();
+    connection = await mysql.createConnection({
+        host: secrets.host,
+        user: secrets.username,
+        database: secrets.dbname,
+        password: secrets.password,
+    })
+
+    connection.connect((err) => {
+        if (err) throw err;
+    });
+};
+
+getConnection()
 
 const getTasks = (request, response) => {
     const query = 'SELECT * FROM task ORDER BY id ASC';
-
     connection.query(query, (err, result) => {
         if (err) throw err;
         response.json(result)
